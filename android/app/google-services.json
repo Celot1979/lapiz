@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "435607360361",
+    "project_id": "pencil-6bbbc",
+    "storage_bucket": "pencil-6bbbc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:435607360361:android:86793242346b275f4723f8",
+        "android_client_info": {
+          "package_name": "com.example.pencil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "435607360361-32u2k7h1v2rfrfm2t8965mq7v5ks3kd3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.pencil",
+            "certificate_hash": "6448e4b4aab12cabd513a3195fe9fbe1d7829e5f"
+          }
+        },
+        {
+          "client_id": "435607360361-jitnjkb1qc4ckr1b97vtf7pkei6p1d7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_VSWiJhH5knGr0IyJ08e9iXMykO7SK4Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "435607360361-jitnjkb1qc4ckr1b97vtf7pkei6p1d7g.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "435607360361-pcaa1erf7g743lh8p4en84dhguc7rdep.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.pencil"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
