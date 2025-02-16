@@ -1,6 +1,7 @@
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:pencil/pages/a%C3%B1adir_nota.dart';
+import '../services/firebase_servicie.dart';
 
 class Notas extends StatefulWidget {
   const Notas({super.key});
@@ -10,6 +11,23 @@ class Notas extends StatefulWidget {
 }
 
 class _NotasState extends State<Notas> {
+  final FirebaseService _firebaseService = FirebaseService();
+  List _notas = [];
+
+  void onButtonPressed(String tipo) async {
+    List notas;
+    if (tipo == "Personales") {
+      notas = await _firebaseService.getNota("personal");
+    } else if (tipo == "Profesionales") {
+      notas = await _firebaseService.getNota("profesionales");
+    } else {
+      notas = await _firebaseService.getNota(tipo);
+    }
+    setState(() {
+      _notas = notas;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,9 +49,7 @@ class _NotasState extends State<Notas> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: TextButton(
-                      onPressed: () {
-                        // Acción para el botón "personales"
-                      },
+                      onPressed: () => onButtonPressed("Personales"),
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
@@ -44,9 +60,7 @@ class _NotasState extends State<Notas> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: TextButton(
-                      onPressed: () {
-                        // Acción para el botón "profesionales"
-                      },
+                      onPressed: () => onButtonPressed("Profesionales"),
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.black,
                         foregroundColor: Colors.white,
@@ -70,40 +84,49 @@ class _NotasState extends State<Notas> {
                 ],
               ),
             ),
-            // Eliminar el logo
-            // Image.asset(
-            //   'img/logo.jpg',
-            //   width: 400,
-            //   height: 600,
-            // ),
-            // const SizedBox(height: 20),
-            // Eliminar el botón de logearte
-            // FilledButton(
-            //   onPressed: () async {
-            //     
-            //   },
-            //   style: FilledButton.styleFrom(
-            //     backgroundColor: Colors.black,
-            //     foregroundColor: Colors.white,
-            //     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            //   ),
-            //   child: SizedBox(
-            //     width: 150,
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.center,
-            //       children: const [
-            //         Icon(Icons.login),
-            //         SizedBox(width: 8),
-            //         Text(
-            //           'Logeate',
-            //           style: TextStyle(fontWeight: FontWeight.bold),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: _notas.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin:
+                        EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                    child: ListTile(
+                      leading: Icon(Icons.note),
+                      title: Text(
+                        _notas[index]['titulo'] ?? '',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(_notas[index]['campo'] ?? ''),
+                      tileColor: Colors.grey[200],
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
+      ),
+      bottomNavigationBar: CurvedNavigationBar(
+        items: <Widget>[
+          Icon(Icons.add, size: 30, color: Colors.black),
+          Icon(Icons.edit, size: 30, color: Colors.black),
+          Icon(Icons.delete, size: 30, color: Colors.black),
+        ],
+        color: Colors.white,
+        buttonBackgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        animationCurve: Curves.easeInOutCubic,
+        animationDuration: const Duration(milliseconds: 600),
+        onTap: (index) {
+          if (index == 0) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const NotaNueva()),
+            );
+          }
+          // Aquí puedes añadir la lógica para manejar la navegación
+        },
       ),
     );
   }
