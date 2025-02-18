@@ -59,4 +59,24 @@ class FirebaseService {
       print('Error al añadir nota: $e');
     }
   }
+
+
+  Future<void> updateNota(String id, Map<String, dynamic> nuevaNota) async {
+    try {
+      // Referencia a la colección de la nota
+      String coleccion = nuevaNota['clasificacion'];
+      var collectionRef = _firestore.collection(coleccion);
+      
+      // Asegurarse de que 'nuevaNota' contenga todos los campos necesarios
+      if (nuevaNota.isNotEmpty) {
+        // Actualizar la nota en la colección
+        await collectionRef.doc(id).update(nuevaNota);
+        print('Nota con id $id actualizada en la colección $coleccion');
+      } else {
+        print('No se proporcionaron datos para actualizar la nota.');
+      }
+    } catch (e) {
+      print('Error al actualizar nota: $e');
+    }
+  }
 }

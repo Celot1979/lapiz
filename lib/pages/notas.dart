@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:pencil/pages/add_nota.dart';
+import 'package:pencil/pages/edit_nota.dart';
 //import 'package:pencil/pages/add_nota.dart';
 import '../services/firebase_servicie.dart';
 
@@ -100,6 +101,22 @@ class _NotasState extends State<Notas> {
                       ),
                       subtitle: Text(_notas[index]['campo'] ?? ''),
                       tileColor: Colors.grey[200],
+                      onTap: () {
+                        // Navegar a la pantalla de edición pasando el ID y los datos de la nota
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditNota(
+                              notaId: _notas[index]['id'],
+                              notaData: {
+                                'titulo': _notas[index]['titulo'],
+                                'campo': _notas[index]['campo'],
+                                'clasificacion': _notas[index]['clasificacion'],
+                              },
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   );
                 },
