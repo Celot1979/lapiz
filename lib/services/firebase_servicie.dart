@@ -44,9 +44,15 @@ class FirebaseService {
   Future<void> addNota(Map<String, dynamic> nota) async {
     try {
       String coleccion = nota['clasificacion']; // Obtener el nombre de la colección del campo 'clasificacion'
-      nota['titulo'] = nota['titulo']; // Añadir el título a la nota
-      nota['contenido'] = nota['contenido']; // Añadir el contenido a la nota
+      
+      // Verificar si la colección existe
       var collectionRef = _firestore.collection(coleccion);
+      var snapshot = await collectionRef.limit(1).get();
+      if (snapshot.docs.isEmpty) {
+        print('La colección $coleccion no existe. Creando nueva colección.');
+      }
+      
+      // Añadir la nota a la colección
       await collectionRef.add(nota); // Añadir la nota a la colección
       print('Nota añadida a la colección $coleccion');
     } catch (e) {

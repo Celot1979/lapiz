@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:pencil/pages/a%C3%B1adir_nota.dart';
+import 'package:pencil/pages/add_nota.dart';
+//import 'package:pencil/pages/add_nota.dart';
 import '../services/firebase_servicie.dart';
 
 class Notas extends StatefulWidget {
@@ -122,11 +123,11 @@ class _NotasState extends State<Notas> {
           if (index == 0) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const NotaNueva()),
+              MaterialPageRoute(builder: (context) => AddNota()),
             );
-          }
           // Aquí puedes añadir la lógica para manejar la navegación
-        },
+        }
+        }
       ),
     );
   }
