@@ -79,4 +79,22 @@ class FirebaseService {
       print('Error al actualizar nota: $e');
     }
   }
+
+  Future<void> deleteNota(String coleccion, String id) async {
+    try {
+      var collectionRef = _firestore.collection(coleccion);
+      
+      // Verificar si el documento existe
+      var docSnapshot = await collectionRef.doc(id).get();
+      if (docSnapshot.exists) {
+        // Borrar el documento
+        await collectionRef.doc(id).delete();
+        print('Documento con id $id eliminado de la colección $coleccion');
+      } else {
+        print('El documento con id $id no existe en la colección $coleccion');
+      }
+    } catch (e) {
+      print('Error al eliminar nota: $e');
+    }
+  }
 }

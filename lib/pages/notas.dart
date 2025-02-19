@@ -30,6 +30,37 @@ class _NotasState extends State<Notas> {
     });
   }
 
+  void _confirmDeleteNota(String collectionName, String notaId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmar Borrado'),
+          content: const Text('¿Estás seguro de que deseas borrar esta nota?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _firebaseService.deleteNota(collectionName, notaId);
+                Navigator.of(context).pop(); // Cerrar el diálogo
+                // Navegar a la página de notas
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => Notas()),
+                );
+              },
+              child: const Text('Sí'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,6 +132,10 @@ class _NotasState extends State<Notas> {
                       ),
                       subtitle: Text(_notas[index]['campo'] ?? ''),
                       tileColor: Colors.grey[200],
+                      trailing: IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => _confirmDeleteNota(_notas[index]['clasificacion'], _notas[index]['id']),
+                      ),
                       onTap: () {
                         // Navegar a la pantalla de edición pasando el ID y los datos de la nota
                         Navigator.push(
@@ -128,8 +163,8 @@ class _NotasState extends State<Notas> {
       bottomNavigationBar: CurvedNavigationBar(
         items: <Widget>[
           Icon(Icons.add, size: 30, color: Colors.black),
-          Icon(Icons.edit, size: 30, color: Colors.black),
-          Icon(Icons.delete, size: 30, color: Colors.black),
+          //Icon(Icons.edit, size: 30, color: Colors.black),
+          //Icon(Icons.delete, size: 30, color: Colors.black),
         ],
         color: Colors.white,
         buttonBackgroundColor: Colors.white,
