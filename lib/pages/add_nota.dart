@@ -3,6 +3,8 @@ import 'package:pencil/services/firebase_servicie.dart';
  // Asegúrate de importar el servicio de Firebase
 
 class AddNota extends StatefulWidget {
+  const AddNota({super.key});
+
   @override
   _AddNotaState createState() => _AddNotaState();
 }

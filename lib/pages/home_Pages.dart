@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:pencil/pages/notas.dart';
+import 'package:pencil/pages/calendario.dart';
 //import 'package:pencil/services/auth_service.dart';
 
 
@@ -48,6 +49,11 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Notas()),
+            );
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  Calendario()),
             );
           }
           // Aquí puedes añadir la lógica para manejar la navegación

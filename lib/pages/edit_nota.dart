@@ -5,7 +5,7 @@ class EditNota extends StatefulWidget {
   final String notaId; // ID de la nota seleccionada
   final Map<String, dynamic> notaData; // Datos de la nota
 
-  EditNota({required this.notaId, required this.notaData});
+  const EditNota({super.key, required this.notaId, required this.notaData});
 
   @override
   _EditNotaState createState() => _EditNotaState();
