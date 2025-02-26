@@ -3,6 +3,8 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart'; // Import necesario para soporte de idiomas
 
 class Calendario extends StatefulWidget {
+  const Calendario({super.key});
+
   @override
   _CalendarioState createState() => _CalendarioState();
 }
@@ -35,6 +37,7 @@ class _CalendarioState extends State<Calendario> {
           setState(() {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
+            print('Día seleccionado: $selectedDay');
           });
         },
         calendarFormat: CalendarFormat.month,
@@ -49,11 +52,11 @@ class _CalendarioState extends State<Calendario> {
         ),
         calendarStyle: CalendarStyle(
           todayDecoration: BoxDecoration(
-            color: Colors.blue.shade200,
+            color: Colors.grey,
             shape: BoxShape.circle,
           ),
           selectedDecoration: BoxDecoration(
-            color: Colors.blue,
+            color: Colors.black ,
             shape: BoxShape.circle,
           ),
           weekendTextStyle: TextStyle(color: Colors.red),
