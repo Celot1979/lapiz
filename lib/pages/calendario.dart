@@ -3,6 +3,9 @@ import 'package:pencil/pages/dia_seleccionado.dart';
 import 'package:pencil/pages/selected_day.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart'; // Import necesario para soporte de idiomas
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'package:pencil/pages/ver_recordatorio.dart';
 
 class Calendario extends StatefulWidget {
   const Calendario({super.key});
@@ -20,6 +23,42 @@ class _CalendarioState extends State<Calendario> {
   void initState() {
     super.initState();
     initializeDateFormatting('es_ES'); // Inicializar formato en español
+    _loadMarkedDays(); // Cargar días guardados
+  }
+
+  // Función para cargar los días marcados
+  Future<void> _loadMarkedDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? markedDaysJson = prefs.getString('marked_days');
+    
+    if (markedDaysJson != null) {
+      final List<dynamic> decodedList = json.decode(markedDaysJson);
+      setState(() {
+        _daysWithReminders = decodedList
+            .map((dateString) => DateTime.parse(dateString))
+            .toSet();
+      });
+    }
+  }
+
+  // Función para guardar los días marcados
+  Future<void> _saveMarkedDays() async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String> dateStrings = _daysWithReminders
+        .map((date) => date.toIso8601String())
+        .toList();
+    await prefs.setString('marked_days', json.encode(dateStrings));
+  }
+
+  Future<Map<String, dynamic>?> getRecordatorio(DateTime date) async {
+    final prefs = await SharedPreferences.getInstance();
+    final String key = 'recordatorio_${date.toIso8601String()}';
+    final String? recordatorioJson = prefs.getString(key);
+    
+    if (recordatorioJson != null) {
+      return json.decode(recordatorioJson);
+    }
+    return null;
   }
 
   @override
@@ -45,27 +84,65 @@ class _CalendarioState extends State<Calendario> {
         selectedDayPredicate: (day) {
           return isSameDay(_selectedDay, day);
         },
-        onDaySelected: (selectedDay, focusedDay) {
+        onDaySelected: (selectedDay, focusedDay) async {
           setState(() {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
           });
-          
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AgendaIconExample(selectedDate: selectedDay),
-            ),
-          ).then((_) {
-            setState(() {
-              // Agregar el día seleccionado al conjunto de días con recordatorios
-              _daysWithReminders.add(DateTime(
-                selectedDay.year,
-                selectedDay.month,
-                selectedDay.day,
-              ));
-            });
-          });
+
+          bool hasReminder = _daysWithReminders.contains(DateTime(
+            selectedDay.year,
+            selectedDay.month,
+            selectedDay.day,
+          ));
+
+          if (hasReminder) {
+            final recordatorio = await getRecordatorio(selectedDay);
+            if (recordatorio != null) {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VerRecordatorio(
+                    selectedDate: selectedDay,
+                    recordatorio: recordatorio,
+                  ),
+                ),
+              );
+
+              // Manejar el resultado de ver/editar el recordatorio
+              if (result == 'deleted') {
+                setState(() {
+                  _daysWithReminders.remove(DateTime(
+                    selectedDay.year,
+                    selectedDay.month,
+                    selectedDay.day,
+                  ));
+                  _saveMarkedDays();
+                });
+              } else if (result == 'updated') {
+                // Recargar los datos del calendario si es necesario
+                await _loadMarkedDays();
+              }
+            }
+          } else {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AgendaIconExample(selectedDate: selectedDay),
+              ),
+            );
+
+            if (result != null) {
+              setState(() {
+                _daysWithReminders.add(DateTime(
+                  selectedDay.year,
+                  selectedDay.month,
+                  selectedDay.day,
+                ));
+                _saveMarkedDays();
+              });
+            }
+          }
         },
         calendarFormat: CalendarFormat.month,
         startingDayOfWeek: StartingDayOfWeek.monday,

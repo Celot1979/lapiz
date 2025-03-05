@@ -5,8 +5,13 @@ import 'dart:convert';
 
 class AgendaIconExample extends StatefulWidget {
   final DateTime selectedDate;
+  final Map<String, dynamic>? recordatorioExistente;
 
-  const AgendaIconExample({Key? key, required this.selectedDate}) : super(key: key);
+  const AgendaIconExample({
+    Key? key, 
+    required this.selectedDate, 
+    this.recordatorioExistente,
+  }) : super(key: key);
 
   @override
   State<AgendaIconExample> createState() => _AgendaIconExampleState();
@@ -17,6 +22,17 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
   TextEditingController _reminderController = TextEditingController();
   TextEditingController _horaController = TextEditingController();
   TextEditingController _minutoController = TextEditingController();
+  TimeOfDay _selectedTime = TimeOfDay.now();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.recordatorioExistente != null) {
+      _reminderController.text = widget.recordatorioExistente!['recordatorio'];
+      _horaController.text = widget.recordatorioExistente!['hora']['hora'].toString();
+      _minutoController.text = widget.recordatorioExistente!['hora']['minuto'].toString();
+    }
+  }
 
   String _formatDate(DateTime date) {
     return "${date.day}/${date.month}/${date.year}";
@@ -26,7 +42,9 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nuevo Recordatorio'),
+        title: Text(widget.recordatorioExistente != null 
+            ? 'Editar Recordatorio' 
+            : 'Nuevo Recordatorio'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -114,23 +132,18 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
                           'año': widget.selectedDate.year
                         },
                         'hora': {
-                          'hora': int.parse(_horaController.text),
-                          'minuto': int.parse(_minutoController.text)
+                          'hora': _selectedTime.hour,
+                          'minuto': _selectedTime.minute
                         },
                         'recordatorio': _reminderController.text
                       };
-                      
+
                       // Guardar el recordatorio
                       final prefs = await SharedPreferences.getInstance();
                       final String key = 'recordatorio_${widget.selectedDate.toIso8601String()}';
                       await prefs.setString(key, json.encode(recordatorio));
 
-                      // Imprimir en consola
-                      print('Nuevo recordatorio guardado:');
-                      print('Fecha: ${widget.selectedDate.day}/${widget.selectedDate.month}/${widget.selectedDate.year}');
-                      print('Hora: ${_horaController.text}:${_minutoController.text}');
-                      print('Recordatorio: ${_reminderController.text}');
-
+                      // Volver a la página anterior con el resultado
                       Navigator.pop(context, recordatorio);
                     }
                   },
