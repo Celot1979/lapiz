@@ -1,7 +1,8 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
-import 'dart:io' show Platform;
+import 'package:universal_html/html.dart' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class NotificationService {
   static final NotificationService _notificationService = NotificationService._internal();
@@ -14,40 +15,38 @@ class NotificationService {
   NotificationService._internal();
 
   Future<void> init() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-    
-    final DarwinInitializationSettings initializationSettingsIOS =
-        DarwinInitializationSettings(
-      requestSoundPermission: true,
-      requestBadgePermission: true,
-      requestAlertPermission: true,
-    );
+    if (!kIsWeb) {
+      // Configuración para plataformas nativas
+      const AndroidInitializationSettings initializationSettingsAndroid =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    final InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-      iOS: initializationSettingsIOS,
-    );
+      final DarwinInitializationSettings initializationSettingsDarwin =
+          DarwinInitializationSettings(
+        requestSoundPermission: true,
+        requestBadgePermission: true,
+        requestAlertPermission: true,
+      );
 
-    tz.initializeTimeZones();
+      final LinuxInitializationSettings initializationSettingsLinux =
+          LinuxInitializationSettings(
+        defaultActionName: 'Abrir notificación',
+      );
 
-    await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse details) async {
-        print('Notificación recibida: ${details.payload}');
-      },
-    );
+      final InitializationSettings initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid,
+        iOS: initializationSettingsDarwin,
+        macOS: initializationSettingsDarwin,
+        linux: initializationSettingsLinux,
+      );
 
-    // Solicitar permisos en iOS
-    if (Platform.isIOS) {
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: true,
-            badge: true,
-            sound: true,
-          );
+      await flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse: (NotificationResponse details) async {
+          print('Notificación recibida: ${details.payload}');
+        },
+      );
     }
+    tz.initializeTimeZones();
   }
 
   Future<void> programarNotificacion({
@@ -56,25 +55,74 @@ class NotificationService {
     required String cuerpo,
     required DateTime fechaHora,
   }) async {
+    if (kIsWeb) {
+      _programarNotificacionWeb(titulo: titulo, cuerpo: cuerpo, fechaHora: fechaHora);
+    } else {
+      await _programarNotificacionNativa(
+        id: id,
+        titulo: titulo,
+        cuerpo: cuerpo,
+        fechaHora: fechaHora,
+      );
+    }
+  }
+
+  void _programarNotificacionWeb({
+    required String titulo,
+    required String cuerpo,
+    required DateTime fechaHora,
+  }) {
+    if (html.Notification.supported) {
+      html.Notification.requestPermission().then((permission) {
+        if (permission == 'granted') {
+          // Calcular el delay hasta la notificación
+          final delay = fechaHora.difference(DateTime.now());
+          Future.delayed(delay, () {
+            html.Notification(
+              titulo,
+              body: cuerpo,
+            );
+          });
+        }
+      });
+    }
+  }
+
+  Future<void> _programarNotificacionNativa({
+    required int id,
+    required String titulo,
+    required String cuerpo,
+    required DateTime fechaHora,
+  }) async {
+    final NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: AndroidNotificationDetails(
+        'recordatorios_channel',
+        'Recordatorios',
+        channelDescription: 'Canal para recordatorios',
+        importance: Importance.max,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      macOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+      ),
+      linux: LinuxNotificationDetails(
+        urgency: LinuxNotificationUrgency.normal,
+      ),
+    );
+
     await flutterLocalNotificationsPlugin.zonedSchedule(
       id,
       titulo,
       cuerpo,
       tz.TZDateTime.from(fechaHora, tz.local),
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          'recordatorios_channel',
-          'Recordatorios',
-          channelDescription: 'Canal para recordatorios',
-          importance: Importance.max,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentBadge: true,
-          presentSound: true,
-        ),
-      ),
+      platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
@@ -82,6 +130,8 @@ class NotificationService {
   }
 
   Future<void> cancelarNotificacion(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    if (!kIsWeb) {
+      await flutterLocalNotificationsPlugin.cancel(id);
+    }
   }
 }

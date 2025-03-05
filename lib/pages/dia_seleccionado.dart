@@ -21,9 +21,9 @@ class AgendaIconExample extends StatefulWidget {
 class _AgendaIconExampleState extends State<AgendaIconExample> {
   final _formKey = GlobalKey<FormState>();
   // Se elimina la referencia a NotificationService debido a que no está definida
-  TextEditingController _reminderController = TextEditingController();
-  TextEditingController _horaController = TextEditingController();
-  TextEditingController _minutoController = TextEditingController();
+  final TextEditingController _reminderController = TextEditingController();
+  final TextEditingController _horaController = TextEditingController();
+  final TextEditingController _minutoController = TextEditingController();
 
   @override
   void initState() {
