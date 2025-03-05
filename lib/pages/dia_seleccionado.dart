@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pencil/widgets/agenda_icon.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class AgendaIconExample extends StatefulWidget {
   final DateTime selectedDate;
@@ -12,8 +14,9 @@ class AgendaIconExample extends StatefulWidget {
 
 class _AgendaIconExampleState extends State<AgendaIconExample> {
   final _formKey = GlobalKey<FormState>();
-  TimeOfDay _selectedTime = TimeOfDay.now();
   TextEditingController _reminderController = TextEditingController();
+  TextEditingController _horaController = TextEditingController();
+  TextEditingController _minutoController = TextEditingController();
 
   String _formatDate(DateTime date) {
     return "${date.day}/${date.month}/${date.year}";
@@ -54,25 +57,55 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
                 },
               ),
               SizedBox(height: 20),
-              ListTile(
-                title: Text('Hora: ${_selectedTime.format(context)}'),
-                trailing: Icon(Icons.access_time),
-                onTap: () async {
-                  final TimeOfDay? picked = await showTimePicker(
-                    context: context,
-                    initialTime: _selectedTime,
-                  );
-                  if (picked != null && picked != _selectedTime) {
-                    setState(() {
-                      _selectedTime = picked;
-                    });
-                  }
-                },
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _horaController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Hora (0-23)',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Requerido';
+                        }
+                        int? hora = int.tryParse(value);
+                        if (hora == null || hora < 0 || hora > 23) {
+                          return 'Hora inválida';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _minutoController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Minutos (0-59)',
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Requerido';
+                        }
+                        int? minuto = int.tryParse(value);
+                        if (minuto == null || minuto < 0 || minuto > 59) {
+                          return 'Minutos inválidos';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       final recordatorio = {
                         'fecha': {
@@ -81,15 +114,24 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
                           'año': widget.selectedDate.year
                         },
                         'hora': {
-                          'hora': _selectedTime.hour,
-                          'minuto': _selectedTime.minute
+                          'hora': int.parse(_horaController.text),
+                          'minuto': int.parse(_minutoController.text)
                         },
                         'recordatorio': _reminderController.text
                       };
                       
-                      print('Datos del recordatorio: $recordatorio');
-                      
-                      Navigator.pop(context);
+                      // Guardar el recordatorio
+                      final prefs = await SharedPreferences.getInstance();
+                      final String key = 'recordatorio_${widget.selectedDate.toIso8601String()}';
+                      await prefs.setString(key, json.encode(recordatorio));
+
+                      // Imprimir en consola
+                      print('Nuevo recordatorio guardado:');
+                      print('Fecha: ${widget.selectedDate.day}/${widget.selectedDate.month}/${widget.selectedDate.year}');
+                      print('Hora: ${_horaController.text}:${_minutoController.text}');
+                      print('Recordatorio: ${_reminderController.text}');
+
+                      Navigator.pop(context, recordatorio);
                     }
                   },
                   child: Text('Guardar'),
@@ -105,6 +147,8 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
   @override
   void dispose() {
     _reminderController.dispose();
+    _horaController.dispose();
+    _minutoController.dispose();
     super.dispose();
   }
 }

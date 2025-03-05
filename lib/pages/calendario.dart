@@ -14,6 +14,7 @@ class Calendario extends StatefulWidget {
 class _CalendarioState extends State<Calendario> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  Set<DateTime> _daysWithReminders = {}; // Nuevo conjunto para días con recordatorios
 
   @override
   void initState() {
@@ -49,12 +50,22 @@ class _CalendarioState extends State<Calendario> {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
           });
+          
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => AgendaIconExample(selectedDate: selectedDay),
             ),
-          );
+          ).then((_) {
+            setState(() {
+              // Agregar el día seleccionado al conjunto de días con recordatorios
+              _daysWithReminders.add(DateTime(
+                selectedDay.year,
+                selectedDay.month,
+                selectedDay.day,
+              ));
+            });
+          });
         },
         calendarFormat: CalendarFormat.month,
         startingDayOfWeek: StartingDayOfWeek.monday,
@@ -72,10 +83,41 @@ class _CalendarioState extends State<Calendario> {
             shape: BoxShape.circle,
           ),
           selectedDecoration: BoxDecoration(
-            color: Colors.black ,
+            color: Colors.black,
             shape: BoxShape.circle,
           ),
           weekendTextStyle: TextStyle(color: Colors.red),
+          // Agregar decoración para días con recordatorios
+          markerDecoration: BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.circle,
+          ),
+        ),
+        calendarBuilders: CalendarBuilders(
+          defaultBuilder: (context, day, focusedDay) {
+            // Verificar si el día tiene un recordatorio
+            bool hasReminder = _daysWithReminders.contains(DateTime(
+              day.year,
+              day.month,
+              day.day,
+            ));
+            
+            if (hasReminder) {
+              return Container(
+                margin: const EdgeInsets.all(4.0),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '${day.day}',
+                  style: TextStyle(color: Colors.white),
+                ),
+              );
+            }
+            return null;
+          },
         ),
       ),
     );
