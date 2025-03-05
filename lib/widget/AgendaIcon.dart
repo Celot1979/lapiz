@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AgendaIcon extends StatelessWidget {
   final DateTime selectedDate;
 
-  AgendaIcon({required this.selectedDate});
+  const AgendaIcon({super.key, required this.selectedDate});
 
   @override
   Widget build(BuildContext context) {

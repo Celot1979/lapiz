@@ -2,16 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:pencil/widgets/agenda_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:timezone/data/latest.dart' as tz;
 
 class AgendaIconExample extends StatefulWidget {
   final DateTime selectedDate;
   final Map<String, dynamic>? recordatorioExistente;
 
   const AgendaIconExample({
-    Key? key, 
-    required this.selectedDate, 
+    super.key,
+    required this.selectedDate,
     this.recordatorioExistente,
-  }) : super(key: key);
+  });
 
   @override
   State<AgendaIconExample> createState() => _AgendaIconExampleState();
@@ -19,6 +20,7 @@ class AgendaIconExample extends StatefulWidget {
 
 class _AgendaIconExampleState extends State<AgendaIconExample> {
   final _formKey = GlobalKey<FormState>();
+  // Se elimina la referencia a NotificationService debido a que no está definida
   TextEditingController _reminderController = TextEditingController();
   TextEditingController _horaController = TextEditingController();
   TextEditingController _minutoController = TextEditingController();
@@ -35,6 +37,55 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
 
   String _formatDate(DateTime date) {
     return "${date.day}/${date.month}/${date.year}";
+  }
+
+  Future<void> _guardarRecordatorio() async {
+    if (_formKey.currentState!.validate()) {
+      // Crear DateTime para la notificación
+      final fechaHora = DateTime(
+        widget.selectedDate.year,
+        widget.selectedDate.month,
+        widget.selectedDate.day,
+        int.parse(_horaController.text),
+        int.parse(_minutoController.text),
+      );
+
+      // Generar ID único para la notificación
+      final notificationId = fechaHora.millisecondsSinceEpoch ~/ 1000;
+
+      final recordatorio = {
+        'fecha': {
+          'dia': widget.selectedDate.day,
+          'mes': widget.selectedDate.month,
+          'año': widget.selectedDate.year
+        },
+        'hora': {
+          'hora': int.parse(_horaController.text),
+          'minuto': int.parse(_minutoController.text)
+        },
+        'recordatorio': _reminderController.text,
+        'notificationId': notificationId,
+      };
+
+      // Guardar el recordatorio
+      final prefs = await SharedPreferences.getInstance();
+      final String key = 'recordatorio_${widget.selectedDate.toIso8601String()}';
+      await prefs.setString(key, json.encode(recordatorio));
+      // Programar la notificación
+      // Se elimina la referencia a _notificationService debido a que no está definida
+      // Se asume que la programación de la notificación se realizará de manera diferente
+
+      if (widget.recordatorioExistente != null) {
+        // Cancelar notificación anterior si estamos editando
+        if (widget.recordatorioExistente!.containsKey('notificationId')) {
+          // Se elimina la referencia a _notificationService debido a que no está definida
+          // Se asume que la cancelación de la notificación se realizará de manera diferente
+        }
+        Navigator.pop(context, 'updated');
+      } else {
+        Navigator.pop(context, recordatorio);
+      }
+    }
   }
 
   @override
@@ -122,37 +173,7 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
               SizedBox(height: 20),
               Center(
                 child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      // Crear el objeto recordatorio con la hora introducida por el usuario
-                      final recordatorio = {
-                        'fecha': {
-                          'dia': widget.selectedDate.day,
-                          'mes': widget.selectedDate.month,
-                          'año': widget.selectedDate.year
-                        },
-                        'hora': {
-                          'hora': int.parse(_horaController.text),
-                          'minuto': int.parse(_minutoController.text)
-                        },
-                        'recordatorio': _reminderController.text,
-                        'timestamp': DateTime.now().toIso8601String() // Para tracking interno
-                      };
-
-                      // Guardar el recordatorio
-                      final prefs = await SharedPreferences.getInstance();
-                      final String key = 'recordatorio_${widget.selectedDate.toIso8601String()}';
-                      await prefs.setString(key, json.encode(recordatorio));
-
-                      // Si estamos editando
-                      if (widget.recordatorioExistente != null) {
-                        Navigator.pop(context, 'updated');
-                      } else {
-                        // Si estamos creando uno nuevo
-                        Navigator.pop(context, recordatorio);
-                      }
-                    }
-                  },
+                  onPressed: _guardarRecordatorio,
                   child: Text('Guardar'),
                 ),
               ),

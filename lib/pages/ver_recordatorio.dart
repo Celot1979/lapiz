@@ -8,10 +8,10 @@ class VerRecordatorio extends StatelessWidget {
   final Map<String, dynamic> recordatorio;
 
   const VerRecordatorio({
-    Key? key, 
+    super.key, 
     required this.selectedDate,
     required this.recordatorio,
-  }) : super(key: key);
+  });
 
   String formatearHora(Map<String, dynamic> recordatorio) {
     String hora = recordatorio['hora']['hora'].toString().padLeft(2, '0');
