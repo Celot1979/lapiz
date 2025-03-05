@@ -22,7 +22,6 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
   TextEditingController _reminderController = TextEditingController();
   TextEditingController _horaController = TextEditingController();
   TextEditingController _minutoController = TextEditingController();
-  TimeOfDay _selectedTime = TimeOfDay.now();
 
   @override
   void initState() {
@@ -125,6 +124,7 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // Crear el objeto recordatorio con la hora introducida por el usuario
                       final recordatorio = {
                         'fecha': {
                           'dia': widget.selectedDate.day,
@@ -132,10 +132,11 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
                           'año': widget.selectedDate.year
                         },
                         'hora': {
-                          'hora': _selectedTime.hour,
-                          'minuto': _selectedTime.minute
+                          'hora': int.parse(_horaController.text),
+                          'minuto': int.parse(_minutoController.text)
                         },
-                        'recordatorio': _reminderController.text
+                        'recordatorio': _reminderController.text,
+                        'timestamp': DateTime.now().toIso8601String() // Para tracking interno
                       };
 
                       // Guardar el recordatorio
@@ -143,8 +144,13 @@ class _AgendaIconExampleState extends State<AgendaIconExample> {
                       final String key = 'recordatorio_${widget.selectedDate.toIso8601String()}';
                       await prefs.setString(key, json.encode(recordatorio));
 
-                      // Volver a la página anterior con el resultado
-                      Navigator.pop(context, recordatorio);
+                      // Si estamos editando
+                      if (widget.recordatorioExistente != null) {
+                        Navigator.pop(context, 'updated');
+                      } else {
+                        // Si estamos creando uno nuevo
+                        Navigator.pop(context, recordatorio);
+                      }
                     }
                   },
                   child: Text('Guardar'),

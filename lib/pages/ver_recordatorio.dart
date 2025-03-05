@@ -13,11 +13,14 @@ class VerRecordatorio extends StatelessWidget {
     required this.recordatorio,
   }) : super(key: key);
 
+  String formatearHora(Map<String, dynamic> recordatorio) {
+    String hora = recordatorio['hora']['hora'].toString().padLeft(2, '0');
+    String minuto = recordatorio['hora']['minuto'].toString().padLeft(2, '0');
+    return '$hora:$minuto';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final hora = recordatorio['hora']['hora'].toString().padLeft(2, '0');
-    final minuto = recordatorio['hora']['minuto'].toString().padLeft(2, '0');
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Recordatorio'),
@@ -93,8 +96,8 @@ class VerRecordatorio extends StatelessWidget {
             Card(
               child: ListTile(
                 leading: Icon(Icons.access_time),
-                title: Text('Hora:'),
-                subtitle: Text('$hora:$minuto'),
+                title: Text('Hora programada:'),
+                subtitle: Text(formatearHora(recordatorio)),
               ),
             ),
             SizedBox(height: 16),
