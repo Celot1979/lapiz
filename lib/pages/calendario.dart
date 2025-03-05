@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pencil/pages/dia_seleccionado.dart';
+import 'package:pencil/pages/selected_day.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart'; // Import necesario para soporte de idiomas
 
@@ -24,6 +26,15 @@ class _CalendarioState extends State<Calendario> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Calendario'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today), // Ícono de agenda
+            onPressed: () {
+              // Acción al presionar el ícono
+              print('Ícono de agenda presionado');
+            },
+          ),
+        ],
       ),
       body: TableCalendar(
         locale: 'es_ES', // Configurar en español
@@ -37,8 +48,13 @@ class _CalendarioState extends State<Calendario> {
           setState(() {
             _selectedDay = selectedDay;
             _focusedDay = focusedDay;
-            print('Día seleccionado: $selectedDay');
           });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AgendaIconExample(selectedDate: selectedDay),
+            ),
+          );
         },
         calendarFormat: CalendarFormat.month,
         startingDayOfWeek: StartingDayOfWeek.monday,
@@ -52,7 +68,7 @@ class _CalendarioState extends State<Calendario> {
         ),
         calendarStyle: CalendarStyle(
           todayDecoration: BoxDecoration(
-            color: Colors.grey,
+            color: Colors.black,
             shape: BoxShape.circle,
           ),
           selectedDecoration: BoxDecoration(
