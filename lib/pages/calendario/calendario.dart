@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pencil/pages/dia_seleccionado.dart';
-import 'package:pencil/pages/selected_day.dart';
+import 'package:pencil/pages/calendario/dia_seleccionado.dart';
+import 'package:pencil/pages/calendario/selected_day.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/date_symbol_data_local.dart'; // Import necesario para soporte de idiomas
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:pencil/pages/ver_recordatorio.dart';
+import 'package:pencil/pages/calendario/ver_recordatorio.dart';
 
 class Calendario extends StatefulWidget {
   const Calendario({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pencil/pages/home_Pages.dart';
-import 'package:pencil/pages/notas.dart';
+import 'package:pencil/pages/p%C3%A1ginas%20principales/home_Pages.dart';
+import 'package:pencil/pages/notas/notas.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 

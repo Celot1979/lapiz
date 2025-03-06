@@ -1,18 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:pencil/pages/notas.dart';
+import 'package:pencil/pages/notas/notas.dart';
+import 'package:pencil/pages/calendario/calendario.dart';
+//import 'package:pencil/services/auth_service.dart';
 
-class LandingPage extends StatelessWidget {
-  const LandingPage({super.key});
 
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text(''),
       ),
-      body: const Center(
-        child: Text(''),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'img/logo.jpg',
+              width: 400,
+              height: 600,
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
       bottomNavigationBar: CurvedNavigationBar(
         items: <Widget>[
@@ -29,6 +49,11 @@ class LandingPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const Notas()),
+            );
+          } else if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>  Calendario()),
             );
           }
           // Aquí puedes añadir la lógica para manejar la navegación

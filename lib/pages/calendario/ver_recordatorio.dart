@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pencil/pages/dia_seleccionado.dart';
+import 'package:pencil/pages/calendario/dia_seleccionado.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
