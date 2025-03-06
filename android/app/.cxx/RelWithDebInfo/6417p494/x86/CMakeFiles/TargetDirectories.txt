@@ -1,0 +1,2 @@
+/Users/danielgil/Documents/pencil/android/app/.cxx/RelWithDebInfo/6417p494/x86/CMakeFiles/edit_cache.dir
+/Users/danielgil/Documents/pencil/android/app/.cxx/RelWithDebInfo/6417p494/x86/CMakeFiles/rebuild_cache.dir

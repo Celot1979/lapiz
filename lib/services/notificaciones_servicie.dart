@@ -3,6 +3,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:universal_html/html.dart' as html;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io' show Platform;
 
 class NotificationService {
   static final NotificationService _notificationService = NotificationService._internal();
@@ -16,7 +17,6 @@ class NotificationService {
 
   Future<void> init() async {
     if (!kIsWeb) {
-      // Configuración para plataformas nativas
       const AndroidInitializationSettings initializationSettingsAndroid =
           AndroidInitializationSettings('@mipmap/ic_launcher');
 
@@ -27,17 +27,14 @@ class NotificationService {
         requestAlertPermission: true,
       );
 
-      final LinuxInitializationSettings initializationSettingsLinux =
-          LinuxInitializationSettings(
-        defaultActionName: 'Abrir notificación',
-      );
-
       final InitializationSettings initializationSettings = InitializationSettings(
         android: initializationSettingsAndroid,
         iOS: initializationSettingsDarwin,
         macOS: initializationSettingsDarwin,
-        linux: initializationSettingsLinux,
       );
+
+      // Inicializar zonas horarias antes de inicializar las notificaciones
+      tz.initializeTimeZones();
 
       await flutterLocalNotificationsPlugin.initialize(
         initializationSettings,
@@ -45,8 +42,24 @@ class NotificationService {
           print('Notificación recibida: ${details.payload}');
         },
       );
+
+      // Crear el canal de notificaciones para Android
+      if (Platform.isAndroid) {
+        const AndroidNotificationChannel channel = AndroidNotificationChannel(
+          'recordatorios_channel',
+          'Recordatorios',
+          description: 'Canal para recordatorios',
+          importance: Importance.max,
+          playSound: true,
+          enableVibration: true,
+          enableLights: true,
+        );
+
+        await flutterLocalNotificationsPlugin
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+            ?.createNotificationChannel(channel);
+      }
     }
-    tz.initializeTimeZones();
   }
 
   Future<void> programarNotificacion({
@@ -101,32 +114,36 @@ class NotificationService {
         channelDescription: 'Canal para recordatorios',
         importance: Importance.max,
         priority: Priority.high,
+        playSound: true,
+        enableVibration: true,
+        enableLights: true,
+        fullScreenIntent: true,
+        category: AndroidNotificationCategory.alarm,
       ),
       iOS: DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
       ),
-      macOS: DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-      linux: LinuxNotificationDetails(
-        urgency: LinuxNotificationUrgency.normal,
-      ),
     );
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      titulo,
-      cuerpo,
-      tz.TZDateTime.from(fechaHora, tz.local),
-      platformChannelSpecifics,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-    );
+    var scheduledDate = tz.TZDateTime.from(fechaHora, tz.local);
+    
+    try {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        titulo,
+        cuerpo,
+        scheduledDate,
+        platformChannelSpecifics,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+      );
+      print('Notificación programada para: ${scheduledDate.toString()}');
+    } catch (e) {
+      print('Error al programar la notificación: $e');
+    }
   }
 
   Future<void> cancelarNotificacion(int id) async {
