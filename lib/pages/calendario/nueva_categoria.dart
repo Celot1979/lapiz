@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class CrearCategorias extends StatefulWidget {
-  const CrearCategorias({Key? key}) : super(key: key);
+  const CrearCategorias({super.key});
 
   @override
   State<CrearCategorias> createState() => _CrearCategoriasState();
@@ -17,17 +17,18 @@ class _CrearCategoriasState extends State<CrearCategorias> {
     if (_formKey.currentState!.validate()) {
       try {
         final prefs = await SharedPreferences.getInstance();
-        
+
         // Obtener categorías existentes o crear lista vacía
-        List<String> categorias = prefs.getStringList('categorias_personalizadas') ?? [];
-        
+        List<String> categorias =
+            prefs.getStringList('categorias_personalizadas') ?? [];
+
         // Agregar nueva categoría si no existe
         if (!categorias.contains(_categoria)) {
           categorias.add(_categoria);
           await prefs.setStringList('categorias_personalizadas', categorias);
 
           // Crear una lista vacía para las notas de esta categoría
-          await prefs.setString('notas_${_categoria}', json.encode([]));
+          await prefs.setString('notas_$_categoria', json.encode([]));
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Categoría creada exitosamente')),
