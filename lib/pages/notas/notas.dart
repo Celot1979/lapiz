@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:pencil/pages/notas/add_nota.dart';
 import 'package:pencil/pages/notas/edit_nota.dart';
 import 'package:pencil/pages/calendario/nueva_categoria.dart';
+import 'package:pencil/pages/notas/formulario.dart';
+import 'package:pencil/pages/notas/formulario_categoria.dart';
 import '../../services/firebase_servicie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -28,7 +30,8 @@ class _NotasState extends State<Notas> {
   Future<void> _cargarCategoriasPersonalizadas() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      categoriasPersonalizadas = prefs.getStringList('categorias_personalizadas') ?? [];
+      categoriasPersonalizadas =
+          prefs.getStringList('categorias_personalizadas') ?? [];
     });
   }
 
@@ -132,6 +135,11 @@ class _NotasState extends State<Notas> {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: TextButton(
                       onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>  FormularioCategoria()),
+                        );
                         // Acción para el botón "crear tema"
                       },
                       style: TextButton.styleFrom(
@@ -161,7 +169,9 @@ class _NotasState extends State<Notas> {
                       tileColor: Colors.grey[200],
                       trailing: IconButton(
                         icon: Icon(Icons.delete),
-                        onPressed: () => _confirmDeleteNota(_notas[index]['clasificacion'], _notas[index]['id']),
+                        onPressed: () => _confirmDeleteNota(
+                            _notas[index]['clasificacion'],
+                            _notas[index]['id']),
                       ),
                       onTap: () {
                         // Navegar a la pantalla de edición pasando el ID y los datos de la nota
@@ -188,26 +198,25 @@ class _NotasState extends State<Notas> {
         ),
       ),
       bottomNavigationBar: CurvedNavigationBar(
-        items: <Widget>[
-          Icon(Icons.add, size: 30, color: Colors.black),
-          //Icon(Icons.edit, size: 30, color: Colors.black),
-          //Icon(Icons.delete, size: 30, color: Colors.black),
-        ],
-        color: Colors.white,
-        buttonBackgroundColor: Colors.white,
-        backgroundColor: Colors.transparent,
-        animationCurve: Curves.easeInOutCubic,
-        animationDuration: const Duration(milliseconds: 600),
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AddNota()),
-            );
-          // Aquí puedes añadir la lógica para manejar la navegación
-        }
-        }
-      ),
+          items: <Widget>[
+            Icon(Icons.add, size: 30, color: Colors.black),
+            //Icon(Icons.edit, size: 30, color: Colors.black),
+            //Icon(Icons.delete, size: 30, color: Colors.black),
+          ],
+          color: Colors.white,
+          buttonBackgroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
+          animationCurve: Curves.easeInOutCubic,
+          animationDuration: const Duration(milliseconds: 600),
+          onTap: (index) {
+            if (index == 0) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddNota()),
+              );
+              // Aquí puedes añadir la lógica para manejar la navegación
+            }
+          }),
     );
   }
 }
@@ -216,7 +225,8 @@ class _NotasState extends State<Notas> {
 class NotasCategoriaPage extends StatefulWidget {
   final String categoria;
 
-  const NotasCategoriaPage({Key? key, required this.categoria}) : super(key: key);
+  const NotasCategoriaPage({Key? key, required this.categoria})
+      : super(key: key);
 
   @override
   State<NotasCategoriaPage> createState() => _NotasCategoriaPageState();
