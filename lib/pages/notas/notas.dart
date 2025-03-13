@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:pencil/pages/notas/add_nota.dart';
 import 'package:pencil/pages/notas/edit_nota.dart';
 import 'package:pencil/pages/calendario/nueva_categoria.dart';
-import 'package:pencil/pages/notas/formulario.dart';
 import 'package:pencil/pages/notas/formulario_categoria.dart';
 import '../../services/firebase_servicie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -131,7 +130,7 @@ class _NotasState extends State<Notas> {
                       child: const Text('Profesionales'),
                     ),
                   ),
-                  Padding(
+                 /* Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: TextButton(
                       onPressed: () {
@@ -148,7 +147,7 @@ class _NotasState extends State<Notas> {
                       ),
                       child: const Text('+'),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),
