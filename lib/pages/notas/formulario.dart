@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 
 class MyFormPage extends StatelessWidget {
+  const MyFormPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,6 +16,8 @@ class MyFormPage extends StatelessWidget {
 }
 
 class MyForm extends StatefulWidget {
+  const MyForm({super.key});
+
   @override
   _MyFormState createState() => _MyFormState();
 }

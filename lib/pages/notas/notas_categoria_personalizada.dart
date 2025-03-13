@@ -5,9 +5,9 @@ class NotasCategoriaPersonalizada extends StatefulWidget {
   final String nombreCategoria;
 
   const NotasCategoriaPersonalizada({
-    Key? key,
+    super.key,
     required this.nombreCategoria,
-  }) : super(key: key);
+  });
 
   @override
   State<NotasCategoriaPersonalizada> createState() => _NotasCategoriaPersonalizadaState();

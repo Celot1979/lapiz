@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FormularioCategoria extends StatefulWidget {
-  const FormularioCategoria({Key? key}) : super(key: key);
+  const FormularioCategoria({super.key});
 
   @override
   State<FormularioCategoria> createState() => _FormularioCategoriaState();

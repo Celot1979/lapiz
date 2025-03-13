@@ -6,9 +6,9 @@ class DocumentosCategoria extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   DocumentosCategoria({
-    Key? key,
+    super.key,
     required this.nombreCategoria,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

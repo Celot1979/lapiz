@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class CrearCategorias extends StatefulWidget {
-  const CrearCategorias({Key? key}) : super(key: key);
+  const CrearCategorias({super.key});
 
   @override
   State<CrearCategorias> createState() => _CrearCategoriasState();
@@ -27,7 +27,7 @@ class _CrearCategoriasState extends State<CrearCategorias> {
           await prefs.setStringList('categorias_personalizadas', categorias);
 
           // Crear una lista vacía para las notas de esta categoría
-          await prefs.setString('notas_${_categoria}', json.encode([]));
+          await prefs.setString('notas_$_categoria', json.encode([]));
 
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Categoría creada exitosamente')),

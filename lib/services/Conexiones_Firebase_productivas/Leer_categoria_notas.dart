@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LeerCategoriaNota extends StatefulWidget {
-  const LeerCategoriaNota({Key? key}) : super(key: key);
+  const LeerCategoriaNota({super.key});
 
   @override
   State<LeerCategoriaNota> createState() => _LeerCategoriaNotaState();
